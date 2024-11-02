@@ -1,9 +1,12 @@
 import os
+import logging
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 path = os.path.join(basedir, '.env')
 load_dotenv(path)
+
+logger = logging.getLogger(__name__)
 
 
 class Config:

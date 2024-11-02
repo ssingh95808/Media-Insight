@@ -1,15 +1,19 @@
-from flask_restful import Resource
+import os
+import json
+import logging
 import random
 from flask import request
+from flask_restful import Resource
 from config import Config
 from bson.objectid import ObjectId
 from confluent_kafka import Producer
-import json
 from app import db
-import os
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 upload_path = os.path.join(basedir, '../../static/descriptions_images')
+
+logger = logging.getLogger(__name__)
 
 
 def save_to_mongodb(collection_name, data):
@@ -46,8 +50,13 @@ class Text2Image(Resource):
     collection_name = kafka_topic
 
     def get(self, id=None):
-        ret = get_task_from_mongodb(self.collection_name, id)
-        ret.pop('_id', None)
+        try:
+            ret = get_task_from_mongodb(self.collection_name, id)
+            ret.pop('_id', None)
+        except Exception as e:
+            logger.exception(str(e))
+            return {'task_id': id, 'data': {}, 'msg': 'Task not found'}, 404
+        
         if 'image' in ret:
             ret['image'] = f"/api/v1/static/images/{ret['image']}"
         return {
@@ -72,8 +81,12 @@ class GenerateDescription(Resource):
     collection_name = kafka_topic
 
     def get(self, id=None):
-        ret = get_task_from_mongodb(self.collection_name, id)
-        ret.pop('_id', None)
+        try:
+            ret = get_task_from_mongodb(self.collection_name, id)
+            ret.pop('_id', None)
+        except Exception as e:
+            logger.exception(str(e))
+            return {'task_id': id, 'data': {}, 'msg': 'Task not found'}, 404
         
         return {
             'task_id': id,

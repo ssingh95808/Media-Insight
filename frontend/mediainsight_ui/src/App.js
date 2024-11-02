@@ -29,6 +29,7 @@ function App() {
 
     // The server returns a task ID for polling
     setTaskId(data.task_id);
+    setManualTaskId(data.task_id); // Set the task ID for manual fetch
   };
 
   const handleManualFetch = async (e) => {
@@ -45,6 +46,8 @@ function App() {
       } else {
         console.error('Image not found for the given task ID');
         // You might want to add some user feedback here
+        // if task id is not found, we need to show the user that the task id is not found
+        alert('Task ID not found');
       }
     } catch (error) {
       console.error('Error fetching image:', error);
@@ -167,6 +170,7 @@ function App() {
       <h2>Fetch Image by Task ID</h2>
       <form onSubmit={handleManualFetch}>
         <input
+          className="manual-taskid-input" 
           type="text"
           value={manualTaskId}
           onChange={(e) => setManualTaskId(e.target.value)}
